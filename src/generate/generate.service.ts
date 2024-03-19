@@ -12,6 +12,24 @@ export class GenerateService {
   }
 
   findAll(res) {
+    var compiled = ejs.compile(
+      fs.readFileSync(process.cwd() + '/templates/pdf-invoice.html', 'utf8'),
+    );
+
+    var html = compiled({
+      address1: 'bangkok',
+      state1: 'TH',
+      invoiceNo: '123445590',
+    });
+
+    var options = { format: 'A4' };
+
+    return pdf.create(html, options).toBuffer(function (err, buffer) {
+      if (err) return console.log(err);
+      var pdfBuffer = Buffer.from(buffer);
+
+      res.send(pdfBuffer);
+    });
     // const compiledPost = ejs.compile(
     //   fs.readFileSync(process.cwd() + '/templates/pdf-invoice.html', 'utf8'),
     // );
@@ -27,38 +45,6 @@ export class GenerateService {
     //   type: 'buffer',
     // };
 
-    var compiled = ejs.compile(
-      fs.readFileSync(process.cwd() + '/templates/pdf-invoice.html', 'utf8'),
-    );
-
-    var html = compiled({
-      address1: 'bangkok',
-      state1: 'TH',
-      invoiceNo: '123445590',
-    });
-
-    var pdfFilePath = './invioce.pdf';
-    var options = { format: 'Letter' };
-
-    // return pdf.create(html, options).toFile(pdfFilePath, function (err, res2) {
-    //   if (err) {
-    //     console.log(err);
-    //     // res.status(500).send('Some kind of error...');
-    //     return;
-    //   }
-    //   fs.readFile(pdfFilePath, function (err, data) {
-    //     // res.contentType('application/pdf');
-    //     // res.send(data);
-    //     return data;
-    //   });
-    // });
-
-    return pdf.create(html, options).toBuffer(function (err, buffer) {
-      if (err) return console.log(err);
-      var pdfBuffer = Buffer.from(buffer);
-
-      res.send(pdfBuffer);
-    });
     // return pdf.create(documentPost, optionsPost);
 
     // return `This action returns all generate`;
